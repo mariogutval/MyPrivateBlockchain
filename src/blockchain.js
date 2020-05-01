@@ -64,26 +64,25 @@ class Blockchain {
   _addBlock(block) {
     let self = this;
     return new Promise(async (resolve, reject) => {
-      let blockObj = block;
+      let auxBlock = block;
       let height = await self.getChainHeight();
-      blockObj.time = new Date().getTime().toString().slice(0,-3);
+      auxBlock.time = new Date().getTime().toString().slice(0,-3);
       if(height >= 0){
-        blockObj.height = height + 1;
+        auxBlock.height = height+1;
         let previousBlock = self.chain[self.height];
-        blockObj.previousBlockHash = previousBlock.hash;
+        auxBlock.previousBlockHash = previousBlock.hash;
         // Verify signature
-        blockObj.hash = SHA256(JSON.stringify(blockObj)).toString();
-        self.chain.push(blockObj);
-        self.height = self.chain.length -1;
-        resolve(blockObj);
+        auxBlock.hash = SHA256(JSON.stringify(auxBlock)).toString();
+        self.chain.push(auxBlock);
+        self.height = self.chain.length-1;
+        resolve(auxBlock);
       }
       else {
-        // Only for the Genesis Block
-        blockObj.height = height + 1;
-        blockObj.hash = SHA256(JSON.stringify(blockObj)).toString();
-        self.chain.push(blockObj);
-        self.height = self.chain.length - 1;
-        resolve(blockObj);
+        auxBlock.height = height+1;
+        auxBlock.hash = SHA256(JSON.stringify(blockObj)).toString();
+        self.chain.push(auxBlock);
+        self.height = self.chain.length-1;
+        resolve(auxBlock);
       }
     });
   }
@@ -125,7 +124,7 @@ class Blockchain {
       const startTime = parseInt(message.split(':')[1]);
       const currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
       if(currentTime - startTime > 300){
-        reject(new Error('Time elapsed is more than 5 minutes'));
+        reject(new Error('Time elapsed is more than 5 minutes.'));
 	  }
       const valid = bitcoinMessage.verify(message, address, signature);
       if(valid) {
@@ -134,7 +133,7 @@ class Blockchain {
         resolve(addedBlock);
       }
       else {
-        reject(new Error('Verification failed'));
+        reject(new Error('Verification failed.'));
 	  }
     });
   }
